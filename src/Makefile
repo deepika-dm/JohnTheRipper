@@ -176,7 +176,8 @@ JOHN_OBJS = \
 	unshadow.o \
 	unafs.o \
 	undrop.o \
-	unique.o putty2john.o gpg2john.o
+	unique.o putty2john.o gpg2john.o \
+	common-gpu.o
 # broken:
 # zip_fmt.o
 
