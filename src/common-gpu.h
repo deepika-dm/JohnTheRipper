@@ -16,9 +16,32 @@
 #ifndef _COMMON_GPU_H
 #define _COMMON_GPU_H
 
+#ifdef __linux__
 #include <wchar.h>
-
 #include "adl_sdk.h"
+
+#define ADL_WARNING_NO_DATA -100
+typedef int (*ADL_MAIN_CONTROL_CREATE)(ADL_MAIN_MALLOC_CALLBACK, int);
+typedef int (*ADL_MAIN_CONTROL_DESTROY)();
+typedef int (*ADL_ADAPTER_NUMBEROFADAPTERS_GET) (int*);
+typedef int (*ADL_ADAPTER_ADAPTERINFO_GET) (LPAdapterInfo, int);
+typedef int (*ADL_ADAPTER_ACTIVE_GET) (int, int*);
+typedef int (*ADL_OVERDRIVE_CAPS) (int iAdapterIndex, int *iSupported, int *iEnabled, int *iVersion);
+
+typedef int (*ADL_OVERDRIVE5_THERMALDEVICES_ENUM) (int iAdapterIndex, int iThermalControllerIndex, ADLThermalControllerInfo *lpThermalControllerInfo);
+typedef int (*ADL_OVERDRIVE5_TEMPERATURE_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLTemperature *lpTemperature);
+typedef int (*ADL_OVERDRIVE5_FANSPEED_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLFanSpeedValue *lpFanSpeedValue);
+typedef int (*ADL_OVERDRIVE5_FANSPEEDINFO_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLFanSpeedInfo *lpFanSpeedInfo);
+typedef int (*ADL_OVERDRIVE5_ODPARAMETERS_GET) (int iAdapterIndex, ADLODParameters *lpOdParameters);
+typedef int (*ADL_OVERDRIVE5_CURRENTACTIVITY_GET) (int iAdapterIndex, ADLPMActivity *lpActivity);
+
+typedef int (*ADL_OVERDRIVE6_FANSPEED_GET)(int iAdapterIndex, ADLOD6FanSpeedInfo *lpFanSpeedInfo);
+typedef int (*ADL_OVERDRIVE6_THERMALCONTROLLER_CAPS)(int iAdapterIndex, ADLOD6ThermalControllerCaps *lpThermalControllerCaps);
+typedef int (*ADL_OVERDRIVE6_TEMPERATURE_GET)(int iAdapterIndex, int *lpTemperature);
+typedef int (*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
+typedef int (*ADL_OVERDRIVE6_POWERCONTROL_GET)(int iAdapterIndex, int *lpCurrentValue, int *lpDefaultValue);
+
+#endif
 
 /* These are shared between CUDA and OpenCL */
 #define MAX_GPU_DEVICES         128
@@ -63,27 +86,6 @@ typedef nvmlReturn_t ( *NVMLDEVICEGETTEMPERATURE )( nvmlDevice_t, int, unsigned 
 typedef nvmlReturn_t ( *NVMLDEVICEGETFANSPEED ) (nvmlDevice_t, unsigned int *);
 typedef nvmlReturn_t ( *NVMLDEVICEGETUTILIZATIONRATES ) (nvmlDevice_t, nvmlUtilization_t *);
 //typedef nvmlReturn_t ( *NVMLDEVICEGETNAME ) (nvmlDevice_t, char *, unsigned int);
-
-#define ADL_WARNING_NO_DATA -100
-typedef int (*ADL_MAIN_CONTROL_CREATE)(ADL_MAIN_MALLOC_CALLBACK, int);
-typedef int (*ADL_MAIN_CONTROL_DESTROY)();
-typedef int (*ADL_ADAPTER_NUMBEROFADAPTERS_GET) (int*);
-typedef int (*ADL_ADAPTER_ADAPTERINFO_GET) (LPAdapterInfo, int);
-typedef int (*ADL_ADAPTER_ACTIVE_GET) (int, int*);
-typedef int (*ADL_OVERDRIVE_CAPS) (int iAdapterIndex, int *iSupported, int *iEnabled, int *iVersion);
-
-typedef int (*ADL_OVERDRIVE5_THERMALDEVICES_ENUM) (int iAdapterIndex, int iThermalControllerIndex, ADLThermalControllerInfo *lpThermalControllerInfo);
-typedef int (*ADL_OVERDRIVE5_TEMPERATURE_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLTemperature *lpTemperature);
-typedef int (*ADL_OVERDRIVE5_FANSPEED_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLFanSpeedValue *lpFanSpeedValue);
-typedef int (*ADL_OVERDRIVE5_FANSPEEDINFO_GET) (int iAdapterIndex, int iThermalControllerIndex, ADLFanSpeedInfo *lpFanSpeedInfo);
-typedef int (*ADL_OVERDRIVE5_ODPARAMETERS_GET) (int iAdapterIndex, ADLODParameters *lpOdParameters);
-typedef int (*ADL_OVERDRIVE5_CURRENTACTIVITY_GET) (int iAdapterIndex, ADLPMActivity *lpActivity);
-
-typedef int (*ADL_OVERDRIVE6_FANSPEED_GET)(int iAdapterIndex, ADLOD6FanSpeedInfo *lpFanSpeedInfo);
-typedef int (*ADL_OVERDRIVE6_THERMALCONTROLLER_CAPS)(int iAdapterIndex, ADLOD6ThermalControllerCaps *lpThermalControllerCaps);
-typedef int (*ADL_OVERDRIVE6_TEMPERATURE_GET)(int iAdapterIndex, int *lpTemperature);
-typedef int (*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
-typedef int (*ADL_OVERDRIVE6_POWERCONTROL_GET)(int iAdapterIndex, int *lpCurrentValue, int *lpDefaultValue);
 
 /* Progress indicator "spinning wheel" */
 void advance_cursor(void);

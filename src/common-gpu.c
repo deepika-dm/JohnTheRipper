@@ -27,9 +27,6 @@
 int gpu_id;
 int gpu_device_list[MAX_GPU_DEVICES];
 
-static int amd2adl[MAX_GPU_DEVICES];
-static int adl2od[MAX_GPU_DEVICES];
-
 void *nvml_lib;
 NVMLINIT nvmlInit = NULL;
 NVMLSHUTDOWN nvmlShutdown = NULL;
@@ -40,6 +37,11 @@ NVMLDEVICEGETUTILIZATIONRATES nvmlDeviceGetUtilizationRates = NULL;
 //NVMLDEVICEGETNAME nvmlDeviceGetName = NULL;
 
 void *adl_lib;
+
+#ifdef __linux__
+static int amd2adl[MAX_GPU_DEVICES];
+static int adl2od[MAX_GPU_DEVICES];
+
 ADL_MAIN_CONTROL_CREATE ADL_Main_Control_Create;
 ADL_MAIN_CONTROL_DESTROY ADL_Main_Control_Destroy;
 ADL_ADAPTER_NUMBEROFADAPTERS_GET ADL_Adapter_NumberOfAdapters_Get;
@@ -58,6 +60,15 @@ ADL_OVERDRIVE6_FANSPEED_GET ADL_Overdrive6_FanSpeed_Get = NULL;
 ADL_OVERDRIVE6_THERMALCONTROLLER_CAPS ADL_Overdrive6_ThermalController_Caps = NULL;
 ADL_OVERDRIVE6_TEMPERATURE_GET ADL_Overdrive6_Temperature_Get = NULL;
 ADL_OVERDRIVE6_CURRENTSTATUS_GET ADL_Overdrive6_CurrentStatus_Get = NULL;
+
+// Memory allocation callback function
+static void*ADL_Main_Memory_Alloc(int iSize)
+{
+	void*lpBuffer = malloc(iSize);
+	return lpBuffer;
+}
+
+#endif /* __linux__ */
 
 void advance_cursor()
 {
@@ -95,15 +106,9 @@ void nvidia_probe(void)
 	nvmlInit();
 }
 
-// Memory allocation callback function
-static void*ADL_Main_Memory_Alloc(int iSize)
-{
-	void*lpBuffer = malloc(iSize);
-	return lpBuffer;
-}
-
 void amd_probe(void)
 {
+#ifdef __linux__
 	LPAdapterInfo lpAdapterInfo = NULL;
 	int i, ret;
 	int iNumberAdapters = 0;
@@ -194,6 +199,7 @@ void amd_probe(void)
 				adl2od[adl_id] = 0;
 		}
 	}
+#endif
 }
 
 void nvidia_get_temp(int gpu_id, int *temp, int *fanspeed, int *util)
@@ -225,6 +231,7 @@ void nvidia_get_temp(int gpu_id, int *temp, int *fanspeed, int *util)
 	//	printf("Querying %s\n", name);
 }
 
+#ifdef __linux__
 static void get_temp_od5(int adl_id, int *temp, int *fanspeed, int *util)
 {
 	int ADL_Err = ADL_ERR;
@@ -316,19 +323,20 @@ static void get_temp_od6(int adl_id, int *temp, int *fanspeed, int *util)
 
 	return;
 }
+#endif
 
 void amd_get_temp(int amd_id, int *temp, int *fanspeed, int *util)
 {
+#ifdef __linux__
 	int adl_id = amd2adl[amd_id];
 
 	if (adl2od[adl_id] == 5) {
 		get_temp_od5(adl_id, temp, fanspeed, util);
 	} else if (adl2od[adl_id] == 6) {
 		get_temp_od6(adl_id, temp, fanspeed, util);
-	} else {
+	} else
+#endif
 		*temp = *fanspeed = *util = -1;
-	}
-	return;
 }
 
 #endif /* HAVE_ */
